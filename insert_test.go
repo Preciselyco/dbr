@@ -42,6 +42,26 @@ func TestPostgresReturning(t *testing.T) {
 	require.Equal(t, 0, sess.EventReceiver.(*testTraceReceiver).errored)
 }
 
+func TestPostresReturningAll(t *testing.T) {
+	sess := postgresSession
+	reset(t, sess)
+
+	var person dbrPerson
+	err := sess.InsertInto("dbr_people").Columns("name", "email").Values(testName, testEmail).Returning("*").LoadOne(&person)
+	require.NoError(t, err)
+	require.True(t, person.Id > 0)
+	require.True(t, person.Name == testName)
+	require.True(t, person.Email == testEmail)
+	require.Len(t, sess.EventReceiver.(*testTraceReceiver).started, 1)
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[0].eventName, "dbr.select")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[0].query, "INSERT")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[0].query, "dbr_people")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[0].query, "name")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[0].query, "email")
+	require.Equal(t, 1, sess.EventReceiver.(*testTraceReceiver).finished)
+	require.Equal(t, 0, sess.EventReceiver.(*testTraceReceiver).errored)
+}
+
 func BenchmarkInsertValuesSQL(b *testing.B) {
 	buf := NewBuffer()
 	for i := 0; i < b.N; i++ {

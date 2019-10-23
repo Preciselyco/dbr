@@ -224,15 +224,31 @@ func (b *InsertStmt) ExecContext(ctx context.Context) (sql.Result, error) {
 		}
 		b.RecordID = nil
 	}
-
 	return result, nil
 }
 
 func (b *InsertStmt) LoadContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
 	_, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
 	return err
 }
 
 func (b *InsertStmt) Load(value interface{}) error {
 	return b.LoadContext(context.Background(), value)
+}
+
+func (b *InsertStmt) LoadOneContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
+	count, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (b *InsertStmt) LoadOne(value interface{}) error {
+	return b.LoadOneContext(context.Background(), value)
 }

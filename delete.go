@@ -14,9 +14,10 @@ type DeleteStmt struct {
 
 	raw
 
-	Table      string
-	WhereCond  []Builder
-	LimitCount int64
+	Table        string
+	WhereCond    []Builder
+	LimitCount   int64
+	ReturnColumn []string
 
 	comments Comments
 }
@@ -50,6 +51,16 @@ func (b *DeleteStmt) Build(d Dialect, buf Buffer) error {
 	if b.LimitCount >= 0 {
 		buf.WriteString(" LIMIT ")
 		buf.WriteString(strconv.FormatInt(b.LimitCount, 10))
+	}
+
+	if len(b.ReturnColumn) > 0 {
+		buf.WriteString(" RETURNING ")
+		for i, col := range b.ReturnColumn {
+			if i > 0 {
+				buf.WriteString(",")
+			}
+			buf.WriteString(d.QuoteIdent(col))
+		}
 	}
 	return nil
 }
@@ -131,10 +142,41 @@ func (b *DeleteStmt) Comment(comment string) *DeleteStmt {
 	return b
 }
 
+func (b *DeleteStmt) Returning(column ...string) *DeleteStmt {
+	b.ReturnColumn = column
+	return b
+}
+
 func (b *DeleteStmt) Exec() (sql.Result, error) {
 	return b.ExecContext(context.Background())
 }
 
 func (b *DeleteStmt) ExecContext(ctx context.Context) (sql.Result, error) {
 	return exec(ctx, b.runner, b.EventReceiver, b, b.Dialect)
+}
+
+func (b *DeleteStmt) LoadContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
+	_, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
+	return err
+}
+
+func (b *DeleteStmt) Load(value interface{}) error {
+	return b.LoadContext(context.Background(), value)
+}
+
+func (b *DeleteStmt) LoadOneContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
+	count, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (b *DeleteStmt) LoadOne(value interface{}) error {
+	return b.LoadOneContext(context.Background(), value)
 }

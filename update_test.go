@@ -48,3 +48,31 @@ func TestPostgresUpdateReturning(t *testing.T) {
 	require.Equal(t, 1, sess.EventReceiver.(*testTraceReceiver).finished)
 	require.Equal(t, 0, sess.EventReceiver.(*testTraceReceiver).errored)
 }
+
+func TestPostgresUpdateReturningAll(t *testing.T) {
+	sess := postgresSession
+	reset(t, sess)
+	_, err := sess.InsertInto("dbr_people").Columns("name", "email").Values(testName, testEmail).Exec()
+	require.NoError(t, err)
+	var persons []*dbrPerson
+	newName := "Kordian"
+	err = sess.Update("dbr_people").Set("name", newName).
+		Where(Eq("id", 1)).Returning("*").Load(&persons)
+	require.NoError(t, err)
+	require.Len(t, persons, 1)
+	require.Equal(t, persons[0].Email, testEmail)
+	require.Equal(t, persons[0].Name, newName)
+	require.Equal(t, persons[0].Id, int64(1))
+	require.Len(t, sess.EventReceiver.(*testTraceReceiver).started, 2)
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].eventName, "dbr.select")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "UPDATE")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "dbr_people")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "name")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "RETURNING")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "id")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "name")
+	require.Contains(t, sess.EventReceiver.(*testTraceReceiver).started[1].query, "email")
+	require.Equal(t, 2, sess.EventReceiver.(*testTraceReceiver).finished)
+	require.Equal(t, 0, sess.EventReceiver.(*testTraceReceiver).errored)
+
+}

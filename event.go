@@ -1,6 +1,8 @@
 package dbr
 
-import "context"
+import (
+	"context"
+)
 
 // EventReceiver gets events from dbr methods for logging purposes.
 type EventReceiver interface {

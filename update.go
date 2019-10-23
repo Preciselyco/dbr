@@ -193,10 +193,27 @@ func (b *UpdateStmt) ExecContext(ctx context.Context) (sql.Result, error) {
 }
 
 func (b *UpdateStmt) LoadContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
 	_, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
 	return err
 }
 
 func (b *UpdateStmt) Load(value interface{}) error {
 	return b.LoadContext(context.Background(), value)
+}
+
+func (b *UpdateStmt) LoadOneContext(ctx context.Context, value interface{}) error {
+	b.ReturnColumn = expandReturningAll(b.ReturnColumn, value)
+	count, err := query(ctx, b.runner, b.EventReceiver, b, b.Dialect, value)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (b *UpdateStmt) LoadOne(value interface{}) error {
+	return b.LoadOneContext(context.Background(), value)
 }

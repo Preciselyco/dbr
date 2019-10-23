@@ -139,3 +139,29 @@ func (s *tagStore) findValueByName(value reflect.Value, name []string, ret []int
 		}
 	}
 }
+
+func getReturnColumns(value interface{}) []string {
+	s := newTagStore()
+	v := reflect.Indirect(reflect.ValueOf(value))
+	t := v.Type()
+	if t.Kind() == reflect.Struct {
+		return s.get(t)
+	}
+	if t.Kind() == reflect.Slice {
+		elem := reflect.TypeOf(value).Elem()
+		if t.Elem().Kind() == reflect.Ptr {
+			elem = t.Elem().Elem()
+		}
+		if elem.Kind() == reflect.Struct {
+			return s.get(elem)
+		}
+	}
+	return []string{}
+}
+
+func expandReturningAll(columns []string, value interface{}) []string {
+	if len(columns) == 1 && columns[0] == "*" {
+		return getReturnColumns(value)
+	}
+	return columns
+}

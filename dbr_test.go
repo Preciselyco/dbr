@@ -40,6 +40,8 @@ var (
 
 	// all test sessions should be here
 	testSession = []*Session{mysqlSession, postgresSession, sqlite3Session}
+	testName    = "name"
+	testEmail   = "email@test.com"
 )
 
 type dbrPerson struct {
