@@ -173,7 +173,7 @@ func NewNullBool(v interface{}) (n NullBool) {
 
 // The `(*NullTime) Scan(interface{})` and `parseDateTime(string, *time.Location)`
 // functions are slightly modified versions of code from the github.com/go-sql-driver/mysql
-// package. They work with Postgres and MySQL databases. Potential future
+// package. They work with Postgres databases. Potential future
 // drivers should ensure these will work for them, or come up with an alternative.
 //
 // Conforming with its licensing terms the copyright notice and link to the licence

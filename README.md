@@ -162,4 +162,5 @@ Authors:
 * Stefan Nyman -- [https://github.com/StefanNyman](https://github.com/StefanNyman)
 * Sponsored by [UserVoice](https://eng.uservoice.com)
 
-
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FPreciselyco%2Fpqdbr.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FPreciselyco%2Fpqdbr?ref=badge_large)
