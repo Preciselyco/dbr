@@ -1,4 +1,4 @@
-package dbr
+package pqdbr
 
 // Builder builds SQL in Dialect like MySQL, and PostgreSQL.
 // The raw SQL and values are stored in Buffer.

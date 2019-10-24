@@ -1,4 +1,4 @@
-package dbr
+package pqdbr
 
 type raw struct {
 	Query string

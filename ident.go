@@ -1,4 +1,4 @@
-package dbr
+package pqdbr
 
 // I is quoted identifier
 type I string

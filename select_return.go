@@ -1,4 +1,4 @@
-package dbr
+package pqdbr
 
 // ReturnInt64 executes the SelectStmt and returns the value as an int64.
 func (b *SelectStmt) ReturnInt64() (int64, error) {

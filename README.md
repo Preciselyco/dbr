@@ -1,29 +1,24 @@
 # gocraft/dbr (database records)
 
-[![GoDoc](https://godoc.org/github.com/gocraft/dbr?status.png)](https://godoc.org/github.com/gocraft/dbr)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgocraft%2Fdbr.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgocraft%2Fdbr?ref=badge_shield)
-[![Go Report Card](https://goreportcard.com/badge/github.com/gocraft/dbr)](https://goreportcard.com/report/github.com/gocraft/dbr)
-[![CircleCI](https://circleci.com/gh/gocraft/dbr.svg?style=svg)](https://circleci.com/gh/gocraft/dbr)
-
-gocraft/dbr provides additions to Go's database/sql for super fast performance and convenience.
+Preciselyco/pqdbr provides PostgreSQL additions to Go's database/sql for super fast performance and convenience.
+This is a fork of the excellent lib [gocraft/dbr](https://github.com/gocraft/dbr) without MySQL/SQLite support and
+convenience functions for insert/update/delete.
 
 ```
-$ go get -u github.com/gocraft/dbr/v2
+$ go get -u github.com/Preciselyco/pqdbr
 ```
 
 ```go
-import "github.com/gocraft/dbr/v2"
+import "github.com/Preciselyco/pqdbr"
 ```
 
 ## Driver support
 
-* MySQL
 * PostgreSQL
-* SQLite3
 
 ## Examples
 
-See [godoc](https://godoc.org/github.com/gocraft/dbr) for more examples.
+See [godoc](https://godoc.org/github.com/Preciselyco/pqdbr) for more examples.
 
 ### Open connections
 
@@ -42,7 +37,7 @@ sess.Begin()
 ### Create and use Tx
 
 ```go
-sess := mysqlSession
+sess := postgresSession
 tx, err := sess.Begin()
 if err != nil {
 	return
@@ -69,7 +64,7 @@ type Suggestion struct {
 // You can override this with struct tags, just like with JSON tags.
 // This is especially helpful while migrating from legacy systems.
 var suggestions []Suggestion
-sess := mysqlSession
+sess := postgresSession
 sess.Select("*").From("suggestions").Load(&suggestions)
 ```
 
@@ -82,7 +77,7 @@ sess.Select("*").From("suggestions").Load(&suggestions)
 // so that you can easily use a single question mark paired with a
 // dynamically sized slice.
 
-sess := mysqlSession
+sess := postgresSession
 ids := []int64{1, 2, 3, 4, 5}
 sess.Select("*").From("suggestions").Where("id IN ?", ids)
 ```
@@ -90,7 +85,7 @@ sess.Select("*").From("suggestions").Where("id IN ?", ids)
 ### SelectStmt with joins
 
 ```go
-sess := mysqlSession
+sess := postgresSession
 sess.Select("*").From("suggestions").
 	Join("subdomains", "suggestions.subdomain_id = subdomains.id")
 
@@ -121,7 +116,7 @@ sugg := &Suggestion{
 	Title:		NewNullString("Gopher"),
 	CreatedAt:	time.Now(),
 }
-sess := mysqlSession
+sess := postgresSession
 sess.InsertInto("suggestions").
 	Columns("title").
 	Record(&sugg).
@@ -134,7 +129,7 @@ fmt.Println(sugg.ID)
 ### InsertStmt adds data from value
 
 ```go
-sess := mysqlSession
+sess := postgresSession
 sess.InsertInto("suggestions").
 	Pair("title", "Gopher").
 	Pair("body", "I love go.")
@@ -164,6 +159,7 @@ Inspiration from these excellent libraries:
 Authors:
 * Jonathan Novak -- [https://github.com/cypriss](https://github.com/cypriss)
 * Tai-Lin Chu -- [https://github.com/taylorchu](https://github.com/taylorchu)
+* Stefan Nyman -- [https://github.com/StefanNyman](https://github.com/StefanNyman)
 * Sponsored by [UserVoice](https://eng.uservoice.com)
 
 Contributors:
