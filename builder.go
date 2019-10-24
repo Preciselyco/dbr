@@ -1,6 +1,6 @@
 package pqdbr
 
-// Builder builds SQL in Dialect like MySQL, and PostgreSQL.
+// Builder builds SQL in PostgreSQL.
 // The raw SQL and values are stored in Buffer.
 //
 // The core of gocraft/dbr is interpolation, which can expand ? with arbitrary SQL.

@@ -24,12 +24,6 @@ type interpolator struct {
 // under the hood, the mysql driver will create a prepared statement,
 // execute it, and then throw it away. This has a big performance cost.
 //
-// gocraft/dbr doesn't use prepared statements.
-// We ported mysql's query escape functionality directly into our package,
-// which means we interpolate all of those question marks with
-// their arguments before they get to MySQL.
-// The result of this is that it's way faster, and just as secure.
-//
 // Check out these benchmarks from https://github.com/tyler-smith/golang-sql-benchmark.
 func InterpolateForDialect(query string, value []interface{}, d Dialect) (string, error) {
 	i := interpolator{
