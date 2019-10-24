@@ -10,24 +10,24 @@ import (
 func TestUpdateStmt(t *testing.T) {
 	buf := NewBuffer()
 	builder := Update("table").Set("a", 1).Where(Eq("b", 2)).Comment("UPDATE TEST")
-	err := builder.Build(dialect.MySQL, buf)
+	err := builder.Build(dialect.PostgreSQL, buf)
 	require.NoError(t, err)
 
-	require.Equal(t, "/* UPDATE TEST */\nUPDATE `table` SET `a` = ? WHERE (`b` = ?)", buf.String())
+	require.Equal(t, "/* UPDATE TEST */\nUPDATE \"table\" SET \"a\" = ? WHERE (\"b\" = ?)", buf.String())
 	require.Equal(t, []interface{}{1, 2}, buf.Value())
 }
 
 func BenchmarkUpdateValuesSQL(b *testing.B) {
 	buf := NewBuffer()
 	for i := 0; i < b.N; i++ {
-		Update("table").Set("a", 1).Build(dialect.MySQL, buf)
+		Update("table").Set("a", 1).Build(dialect.PostgreSQL, buf)
 	}
 }
 
 func BenchmarkUpdateMapSQL(b *testing.B) {
 	buf := NewBuffer()
 	for i := 0; i < b.N; i++ {
-		Update("table").SetMap(map[string]interface{}{"a": 1, "b": 2}).Build(dialect.MySQL, buf)
+		Update("table").SetMap(map[string]interface{}{"a": 1, "b": 2}).Build(dialect.PostgreSQL, buf)
 	}
 }
 

@@ -24,9 +24,9 @@ func TestSelectStmt(t *testing.T) {
 		Suffix("FOR UPDATE").
 		Comment("SELECT TEST")
 
-	err := builder.Build(dialect.MySQL, buf)
+	err := builder.Build(dialect.PostgreSQL, buf)
 	require.NoError(t, err)
-	require.Equal(t, "/* SELECT TEST */\nSELECT DISTINCT a, b FROM ? LEFT JOIN `table2` ON table.a1 = table.a2 WHERE (`c` = ?) GROUP BY d HAVING (`e` = ?) ORDER BY f ASC LIMIT 3 OFFSET 4 FOR UPDATE", buf.String())
+	require.Equal(t, "/* SELECT TEST */\nSELECT DISTINCT a, b FROM ? LEFT JOIN \"table2\" ON table.a1 = table.a2 WHERE (\"c\" = ?) GROUP BY d HAVING (\"e\" = ?) ORDER BY f ASC LIMIT 3 OFFSET 4 FOR UPDATE", buf.String())
 	// two functions cannot be compared
 	require.Equal(t, 3, len(buf.Value()))
 }
@@ -34,7 +34,7 @@ func TestSelectStmt(t *testing.T) {
 func BenchmarkSelectSQL(b *testing.B) {
 	buf := NewBuffer()
 	for i := 0; i < b.N; i++ {
-		Select("a", "b").From("table").Where(Eq("c", 1)).OrderAsc("d").Build(dialect.MySQL, buf)
+		Select("a", "b").From("table").Where(Eq("c", 1)).OrderAsc("d").Build(dialect.PostgreSQL, buf)
 	}
 }
 

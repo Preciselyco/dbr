@@ -3,12 +3,8 @@ package dialect
 import "strings"
 
 var (
-	// MySQL dialect
-	MySQL = mysql{}
 	// PostgreSQL dialect
 	PostgreSQL = postgreSQL{}
-	// SQLite3 dialect
-	SQLite3 = sqlite3{}
 )
 
 const (

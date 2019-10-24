@@ -25,25 +25,25 @@ func TestInterpolateIgnoreBinary(t *testing.T) {
 		{
 			query:     "?",
 			value:     []interface{}{[]byte{1, 2, 3}},
-			wantQuery: "?",
+			wantQuery: "$1",
 			wantValue: []interface{}{[]byte{1, 2, 3}},
 		},
 		{
 			query:     "? ?",
 			value:     []interface{}{[]byte{1}, []byte{2}},
-			wantQuery: "? ?",
+			wantQuery: "$1 $2",
 			wantValue: []interface{}{[]byte{1}, []byte{2}},
 		},
 		{
 			query:     "? ?",
 			value:     []interface{}{Expr("|?| ?", []byte{1}, Expr("|?|", []byte{2})), []byte{3}},
-			wantQuery: "|?| |?| ?",
+			wantQuery: "|$1| |$2| $3",
 			wantValue: []interface{}{[]byte{1}, []byte{2}, []byte{3}},
 		},
 	} {
 		i := interpolator{
 			Buffer:       NewBuffer(),
-			Dialect:      dialect.MySQL,
+			Dialect:      dialect.PostgreSQL,
 			IgnoreBinary: true,
 		}
 
@@ -68,13 +68,13 @@ func TestInterpolateForDialect(t *testing.T) {
 		},
 		{
 			query: "?",
-			value: []interface{}{`'"'"`},
-			want:  "'\\'\\\"\\'\\\"'",
+			value: []interface{}{"$1"},
+			want:  "'$1'",
 		},
 		{
 			query: "? ?",
 			value: []interface{}{true, false},
-			want:  "1 0",
+			want:  "TRUE FALSE",
 		},
 		{
 			query: "? ?",
@@ -94,7 +94,7 @@ func TestInterpolateForDialect(t *testing.T) {
 		{
 			query: "?",
 			value: []interface{}{[]byte{0x1, 0x2, 0x3}},
-			want:  "0x010203",
+			want:  "E'\\\\x010203'",
 		},
 		{
 			query: "start?end",
@@ -109,12 +109,12 @@ func TestInterpolateForDialect(t *testing.T) {
 		{
 			query: "?",
 			value: []interface{}{I("a1").As("a2")},
-			want:  "`a1` AS `a2`",
+			want:  "\"a1\" AS \"a2\"",
 		},
 		{
 			query: "?",
 			value: []interface{}{Select("a").From("table").As("a1")},
-			want:  "(SELECT a FROM table) AS `a1`",
+			want:  "(SELECT a FROM table) AS \"a1\"",
 		},
 		{
 			query: "?",
@@ -126,7 +126,7 @@ func TestInterpolateForDialect(t *testing.T) {
 			},
 			// parentheses around union subqueries are not supported in sqlite
 			// but supported in both mysql and postgres.
-			want: "(SELECT a FROM table1 UNION ALL SELECT b FROM table2) AS `t`",
+			want: "(SELECT a FROM table1 UNION ALL SELECT b FROM table2) AS \"t\"",
 		},
 		{
 			query: "?",
@@ -149,13 +149,13 @@ func TestInterpolateForDialect(t *testing.T) {
 			want:  "?1",
 		},
 	} {
-		s, err := InterpolateForDialect(test.query, test.value, dialect.MySQL)
+		s, err := InterpolateForDialect(test.query, test.value, dialect.PostgreSQL)
 		require.NoError(t, err)
 		require.Equal(t, test.want, s)
 	}
 }
 
-// Attempts to test common SQL injection strings. See `InjectionAttempts` for
+// Attempts to test common SQL injection strings. See \"$1\" for
 // more information on the source and the strings themselves.
 func TestCommonSQLInjections(t *testing.T) {
 	for _, sess := range testSession {

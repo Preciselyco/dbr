@@ -34,12 +34,8 @@ func TestComments(t *testing.T) {
 		for _, sess := range testSession {
 			name := ""
 			switch sess.Dialect {
-			case dialect.MySQL:
-				name = "MySQL"
 			case dialect.PostgreSQL:
 				name = "PostgreSQL"
-			case dialect.SQLite3:
-				name = "SQLite3"
 			}
 			t.Run(fmt.Sprintf("%s/%s", name, test.name), func(t *testing.T) {
 				buf := NewBuffer()

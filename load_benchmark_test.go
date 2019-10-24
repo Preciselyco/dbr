@@ -10,7 +10,7 @@ import (
 )
 
 func BenchmarkLoadValues(b *testing.B) {
-	sess := mysqlSession
+	sess := postgresSession
 	for _, v := range []string{
 		`DROP TABLE IF EXISTS suggestions`,
 		`CREATE TABLE suggestions (
@@ -46,7 +46,7 @@ func BenchmarkLoadValues(b *testing.B) {
 
 		b.Run(fmt.Sprintf("sqlx_%d", n), func(b *testing.B) {
 			b.StopTimer()
-			db, err := sqlx.Connect("mysql", mysqlDSN)
+			db, err := sqlx.Connect("postgres", postgresDSN)
 			require.NoError(b, err)
 			db = db.Unsafe()
 			defer db.Close()

@@ -15,7 +15,7 @@ func TestSQLMock(t *testing.T) {
 	conn := &Connection{
 		DB:            db,
 		EventReceiver: &NullEventReceiver{},
-		Dialect:       dialect.MySQL,
+		Dialect:       dialect.PostgreSQL,
 	}
 	sess := conn.NewSession(nil)
 

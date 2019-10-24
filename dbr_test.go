@@ -19,9 +19,7 @@ import (
 //
 
 var (
-	mysqlDSN    = os.Getenv("DBR_TEST_MYSQL_DSN")
 	postgresDSN = os.Getenv("DBR_TEST_POSTGRES_DSN")
-	sqlite3DSN  = ":memory:"
 )
 
 func createSession(driver, dsn string) *Session {
@@ -33,13 +31,11 @@ func createSession(driver, dsn string) *Session {
 }
 
 var (
-	mysqlSession          = createSession("mysql", mysqlDSN)
 	postgresSession       = createSession("postgres", postgresDSN)
 	postgresBinarySession = createSession("postgres", postgresDSN+"&binary_parameters=yes")
-	sqlite3Session        = createSession("sqlite3", sqlite3DSN)
 
 	// all test sessions should be here
-	testSession = []*Session{mysqlSession, postgresSession, sqlite3Session}
+	testSession = []*Session{postgresSession}
 	testName    = "name"
 	testEmail   = "email@test.com"
 )
@@ -62,12 +58,8 @@ type nullTypedRecord struct {
 func reset(t *testing.T, sess *Session) {
 	var autoIncrementType string
 	switch sess.Dialect {
-	case dialect.MySQL:
-		autoIncrementType = "serial PRIMARY KEY"
 	case dialect.PostgreSQL:
 		autoIncrementType = "serial PRIMARY KEY"
-	case dialect.SQLite3:
-		autoIncrementType = "integer PRIMARY KEY"
 	}
 	for _, v := range []string{
 		`DROP TABLE IF EXISTS dbr_people`,
@@ -163,12 +155,10 @@ func TestBasicCRUD(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	mysqlSession := createSession("mysql", mysqlDSN)
 	postgresSession := createSession("postgres", postgresDSN)
-	sqlite3Session := createSession("sqlite3", sqlite3DSN)
 
 	// all test sessions should be here
-	testSession := []*Session{mysqlSession, postgresSession, sqlite3Session}
+	testSession := []*Session{postgresSession}
 
 	for _, sess := range testSession {
 		reset(t, sess)
