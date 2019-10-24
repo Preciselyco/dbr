@@ -162,5 +162,4 @@ Authors:
 * Stefan Nyman -- [https://github.com/StefanNyman](https://github.com/StefanNyman)
 * Sponsored by [UserVoice](https://eng.uservoice.com)
 
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fgocraft%2Fdbr.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fgocraft%2Fdbr?ref=badge_large)
+
